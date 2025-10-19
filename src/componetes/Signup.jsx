@@ -3,6 +3,7 @@ import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateP
 import app from '../firebase.Config';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
+import { getDatabase, ref, set } from "firebase/database";
 
 
 
@@ -11,6 +12,8 @@ import { useNavigate } from 'react-router';
 
 const Signup = () => {
     const auth = getAuth(app);
+    const db = getDatabase();
+
 
     let [loading, setLoading] = useState(false)
 
@@ -31,7 +34,7 @@ const Signup = () => {
         password: "",
         cpassword: ""
     })
-  
+
     let navigate = useNavigate()
     let handlesignup = () => {
 
@@ -59,19 +62,27 @@ const Signup = () => {
                 sendEmailVerification(auth.currentUser)
                     .then(() => {
                         updateProfile(auth.currentUser, {
-                            displayName:"info.name", photoURL: "https://example.com/jane-q-user/profile.jpg"
+                            displayName: `${info.name + " " + info.lname}`, photoURL: "https://example.com/jane-q-user/profile.jpg"
                         }).then(() => {
                             const user = userCredential.user;
+                            set(ref(db, 'users/' + user.uid), {
+                                username: info.name + " " + info.lname,
+                                email: info.email,
+                                phone: info.number,
+                                photoURL: "https://example.com/jane-q-user/profile.jpg"
+                                
+                            });
                             setLoading(false)
                             toast.success('Successfully signed up! Verification email sent.');
                             (setErrors((prev) => ({ ...prev, email: "" })));
-                            setTimeout(()=>{
+                            setTimeout(() => {
 
                                 navigate("/Signin")
                             })
-                            console.log(userCredential);
-                        });
                             
+
+                        });
+
                     });
                 // Signed in 
                 // console.log(user);
@@ -162,7 +173,7 @@ const Signup = () => {
                         </div>
                     </div>
                     <div className="mt-12">
-                       
+
                         <button onClick={handlesignup}
                             type="button"
                             className='mx-auto relative  block min-w-32 py-3 px-6 text-sm font-medium tracking-wider rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none cursor-pointer'
@@ -170,7 +181,7 @@ const Signup = () => {
                             {loading ? "Loading..." : "Sign up"}
 
                         </button>
-                       
+
                     </div>
 
                 </form>

@@ -1,23 +1,31 @@
 import React, { useEffect } from 'react'
-import { Outlet } from 'react-router'
+import { Outlet , useNavigate } from 'react-router'
 import app from '../firebase.Config'
 import { getAuth } from 'firebase/auth';
+import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 
 
 
 const RootlayOut = () => {
+  let navigate = useNavigate()
   const auth = getAuth(app);
+  
+  let user = useSelector((state)=> state.user.value);
 
   useEffect(()=>{
-    console.log(auth.currentUser);
+    if(!user){
+     navigate("/signin")
+    }
+
     
   },[auth.currentUser])
 
   return (
    <>
-    <h1>Header</h1>
+  
     <Outlet/>
-    <h1>Footer</h1>
+   
    </>
   )
 }
