@@ -28,11 +28,11 @@ const UserList = () => {
 
     set(push(ref(db, 'addfriend/')), {
       // senderId: user.uid,
-      sendername: user.name + " " + user.lname,
+      sendername: user.displayName,
       senderEmail: user.email,
       // senderPhone: user.number,
       // receiverId: item.uid,
-      receiverName: item.name + " " + item.lname,
+      receiverName: item.username,
       receiverEmail: item.email,
       // receiverPhone: item.number,
       status: "pending",
