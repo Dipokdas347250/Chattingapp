@@ -8,6 +8,7 @@ const UserList = () => {
   let user = useSelector((state) => state.user.value);
   const db = getDatabase();
   let [userList, setUserList] = useState([])
+  let [friendRequestList, setFriendRequestList] = useState([])
 
   useEffect(() => {
     const usersRef = ref(db, 'users/');
@@ -16,7 +17,7 @@ const UserList = () => {
 
       snapshot.forEach((item) => {
         if (item.key !== user.uid)
-          array.push({ ...item.val(), key: item.key });
+          array.push({ ...item.val(), id: item.key });
 
       });
       setUserList(array);
@@ -24,14 +25,26 @@ const UserList = () => {
     });
   }, []);
 
+   useEffect(() => {
+        const addfriendRef = ref(db, 'addfriend/');
+        onValue(addfriendRef, (snapshot) => {
+          let array = [];
+    
+          snapshot.forEach((item) => {
+            array.push(item.val().receiverId + item.val().senderId);
+          });
+         setFriendRequestList(array);
+       });
+      }, []); 
+
   let handleAdd = (item) => {
 
     set(push(ref(db, 'addfriend/')), {
-      // senderId: user.uid,
+      senderId: user.uid,
       sendername: user.displayName,
       senderEmail: user.email,
       // senderPhone: user.number,
-      // receiverId: item.uid,
+      receiverId: item.id,
       receiverName: item.username,
       receiverEmail: item.email,
       // receiverPhone: item.number,
@@ -40,8 +53,10 @@ const UserList = () => {
      
 
     });
+   
     
-    console.log(item);
+    
+
     
 
   }
@@ -54,7 +69,7 @@ const UserList = () => {
       <h1 className="text-2xl font-bold text-slate-800 mb-6">👥 User List</h1>
 
       <div className="divide-y">
-        {userList.map((user) => (
+        {userList.map((users) => (
           <div
 
             className="flex items-center justify-between py-4 hover:bg-slate-50 transition rounded-lg px-2"
@@ -63,30 +78,36 @@ const UserList = () => {
             <div className="flex items-center gap-4">
               {user.photoURL ? (
                 <img
-                  src={user.photoURL}
-                  alt={user.username}
+                  src={users.photoURL}
+                  alt={users.username}
                   className="w-12 h-12 rounded-full object-cover border-2 border-sky-500"
                 />
               ) : (
                 <FaUserCircle className="text-5xl text-slate-400" />
               )}
               <div>
-                <h2 className="text-lg font-semibold text-slate-800">{user.username}</h2>
-                <p className="text-sm text-slate-500">{user.email}</p>
+                <h2 className="text-lg font-semibold text-slate-800">{users.username}</h2>
+                <p className="text-sm text-slate-500">{users.email}</p>
               </div>
             </div>
 
             {/* Status + Action */}
             <div className="flex items-center gap-4">
               <span
-                className={`text-sm font-medium ${user.status === "online" ? "text-green-600" : "text-slate-400"
+                className={`text-sm font-medium ${users.status === "online" ? "text-green-600" : "text-slate-400"
                   }`}
               >
-                ● {user.status}
+                ● {users.status}
               </span>
-              <button onClick={() => handleAdd(user)} className="px-3 py-1 text-sm bg-sky-600 text-white rounded-lg hover:bg-sky-700">
-                Add
-              </button>
+              {friendRequestList.includes(user.uid + users.id) || friendRequestList.includes( users.id + user.uid) ? 
+                <button disabled className="px-3 py-1 text-sm bg-gray-400 text-white rounded-lg cursor-not-allowed">
+                  Reject
+                </button>
+               : 
+                <button onClick={() => handleAdd(users)} className="px-3 py-1 text-sm bg-sky-600 text-white rounded-lg hover:bg-sky-700">
+                  Add
+                </button>
+              }
             </div>
           </div>
         ))}
