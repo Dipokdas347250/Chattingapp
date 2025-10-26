@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { getAuth , signOut } from "firebase/auth";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
+import Friend from "../message/Friend";
 
 const user = () => {
   let user = useSelector((state) => state.user.value);
@@ -81,7 +82,8 @@ const user = () => {
         )}
 
         {/* 💬 Message */}
-        {activePage === "message" && (
+
+        {/* {activePage === "message" && (
           <div className="bg-white rounded-lg shadow-md p-6 flex flex-col h-[70vh]">
             <h1 className="text-2xl font-bold mb-4 text-slate-800">💬 Message</h1>
 
@@ -127,7 +129,67 @@ const user = () => {
               </button>
             </div>
           </div>
+        )} */}
+
+        {activePage === "message" && (
+  <div className="flex gap-4">
+    {/* 👤 User Section */}
+    <div className="bg-white rounded-lg shadow-md p-6 w-[250px] h-[70vh] flex flex-col">
+      <h1 className="text-xl font-bold mb-4 text-slate-800">👥 Friend</h1>
+      <Friend/>
+
+      
+    </div>
+
+    {/* 💬 Message Section */}
+    <div className="bg-white rounded-lg shadow-md p-6 flex flex-col h-[70vh] flex-1">
+      <h1 className="text-2xl font-bold mb-4 text-slate-800">💬 Message</h1>
+
+      <div className="flex-1 overflow-auto mb-4 space-y-2">
+        {messages.length === 0 && (
+          <p className="text-center text-slate-400 text-sm">
+            Start messaging...
+          </p>
         )}
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`flex ${
+              msg.from === "me" ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`px-4 py-2 rounded-lg text-sm ${
+                msg.from === "me"
+                  ? "bg-sky-600 text-white rounded-br-none"
+                  : "bg-slate-100 text-slate-800 rounded-bl-none"
+              }`}
+            >
+              {msg.text}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300"
+          placeholder="Type a message..."
+        />
+        <button
+          onClick={sendMessage}
+          className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
+        >
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
         {/* 👤 Profile */}
         {activePage === "profile" && (

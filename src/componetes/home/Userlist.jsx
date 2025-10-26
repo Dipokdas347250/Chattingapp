@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
-import { getDatabase, ref, onValue, set, push } from "firebase/database";
+import { getDatabase, ref, onValue, set, push, remove } from "firebase/database";
 import { useSelector } from "react-redux";
 
 
@@ -9,6 +9,7 @@ const UserList = () => {
   const db = getDatabase();
   let [userList, setUserList] = useState([])
   let [friendRequestList, setFriendRequestList] = useState([])
+  let [friendList, setFriendList] = useState([])
 
   useEffect(() => {
     const usersRef = ref(db, 'users/');
@@ -29,11 +30,24 @@ const UserList = () => {
         const addfriendRef = ref(db, 'addfriend/');
         onValue(addfriendRef, (snapshot) => {
           let array = [];
-    
+        
           snapshot.forEach((item) => {
             array.push(item.val().receiverId + item.val().senderId);
           });
          setFriendRequestList(array);
+       });
+      }, []); 
+
+
+   useEffect(() => {
+        const addfriendRef = ref(db, 'friendlist/');
+        onValue(addfriendRef, (snapshot) => {
+          let array = [];
+        
+          snapshot.forEach((item) => {
+            array.push(item.val().receiverId + item.val().senderId);
+          });
+         setFriendList(array);
        });
       }, []); 
 
@@ -53,13 +67,11 @@ const UserList = () => {
      
 
     });
-   
-    
-    
-
-    
-
   }
+
+
+
+  
 
 
 
@@ -93,15 +105,18 @@ const UserList = () => {
 
             {/* Status + Action */}
             <div className="flex items-center gap-4">
-              <span
-                className={`text-sm font-medium ${users.status === "online" ? "text-green-600" : "text-slate-400"
-                  }`}
-              >
-                ● {users.status}
-              </span>
-              {friendRequestList.includes(user.uid + users.id) || friendRequestList.includes( users.id + user.uid) ? 
-                <button disabled className="px-3 py-1 text-sm bg-gray-400 text-white rounded-lg cursor-not-allowed">
-                  Reject
+              
+              {friendList.includes(user.uid + users.id) || friendList.includes(users.id + user.uid) ? 
+                <button  className="px-3 py-1 text-sm bg-blue-400 text-white rounded-lg">
+                  Friends
+                </button>
+               :
+                
+              friendRequestList.includes(user.uid + users.id) || friendRequestList.includes( users.id + user.uid) ? 
+
+
+                <button disabled className="px-3 py-1 text-sm bg-gray-400 text-white rounded-lg cursor-no-dropn ">
+                  Remove
                 </button>
                : 
                 <button onClick={() => handleAdd(users)} className="px-3 py-1 text-sm bg-sky-600 text-white rounded-lg hover:bg-sky-700">

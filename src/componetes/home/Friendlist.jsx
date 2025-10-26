@@ -2,35 +2,10 @@ import React, { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { MdMessage } from "react-icons/md";
 import { AiOutlineUserDelete } from "react-icons/ai";
-import { getDatabase, onValue, ref } from "firebase/database";
+import { getDatabase, onValue, push, ref, remove, set } from "firebase/database";
 import { useSelector } from "react-redux";
 
-const friends = [
-  {
-    id: 1,
-    name: "John Doe",
-    status: "Online",
-    avatar: "https://i.pravatar.cc/100?img=11",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    status: "Offline",
-    avatar: "https://i.pravatar.cc/100?img=12",
-  },
-  {
-    id: 3,
-    name: "Robert Brown",
-    status: "Online",
-    avatar: "https://i.pravatar.cc/100?img=13",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    status: "Online",
-    avatar: "https://i.pravatar.cc/100?img=14",
-  },
-];
+
 
 const FriendList = () => {
     let user = useSelector((state) => state.user.value);
@@ -56,12 +31,22 @@ const FriendList = () => {
       });
     }, []);
 
+    let handleComfrim = (confirm) => {
+        set(push(ref(db, 'friendlist/')), {
+          ...confirm,
+          status: "accepted"
+          
+        }).then(() => {
+          remove(ref(db, 'addfriend/' + confirm.id));
+        });
+    };
+
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto mt-10">
       <h1 className="text-2xl font-bold text-slate-800 mb-6">👬 Friend List</h1>
 
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-1 gap-4 ">
         {friendList.map((friend) => (
           <div
             key={friend.id}
@@ -89,29 +74,24 @@ const FriendList = () => {
               <div>
                 <h2 className="text-lg font-semibold text-slate-800">{friend.receiverName}</h2>
                 <h2 className="text-[14px] font-semibold text-slate-800">{friend.senderEmail}</h2>
-                <p
-                  className={`text-sm ${
-                    friend.receiverId === "Online" ? "text-green-600" : "text-slate-400"
-                  }`}
-                >
-                  {friend.receiverId}
-                </p>
+                
               </div>
             </div>
 
             {/* Actions */}
             <div className="flex gap-2">
-              <button
+              <button onClick={() => handleComfrim(friend)}
                 className="p-2 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition"
-                title="Message"
+                title="Confirm"
               >
-                <MdMessage />
+                Confirm
               </button>
               <button
                 className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
                 title="Remove"
               >
-                <AiOutlineUserDelete />
+                Remove
+                
               </button>
             </div>
           </div>
