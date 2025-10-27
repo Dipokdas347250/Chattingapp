@@ -1,10 +1,12 @@
 import { getDatabase, onValue, push, ref, remove, set } from "firebase/database";
 import React, { useEffect, useState } from 'react'
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { messageselect } from "../../slices/messageSlice";
 
 const Friend = () => {
       let user = useSelector((state) => state.user.value);
-
+      let selector = useSelector((state) => state.messageselect.value);
+      let dispatch = useDispatch();
      const db = getDatabase();
      let [friend, setFriend] = useState([]);
       
@@ -26,13 +28,34 @@ const Friend = () => {
       
           });
         }, []);
+      let handlefriend = (item) => {
+        if(user.uid == item.sendername){
+
+          dispatch(messageselect({
+            name: item.receivername,
+            id: item.receiverId,
+            email: item.receiverEmail,
+            photo: item.photoURL
+          }));
+        }else{
+          dispatch(messageselect({
+            name: item.sendername,
+            id: item.senderId,
+            email: item.senderEmail,
+            photo: item.photoURL
+          }));
+        }
+       
+      }
+
+
   return (
     <>
 
 
       {friend.map((item) => (
 
-            <div className="flex items-center gap-3 p-2 rounded-xl cursor-pointer hover:bg-sky-100 transition-all duration-200 group">
+            <div onClick={() => handlefriend(item)} className="flex items-center gap-3 p-2 rounded-xl cursor-pointer hover:bg-sky-100 transition-all duration-200 group">
             <div className="relative">
                 <img
                 src={item.photoURL}
@@ -52,7 +75,7 @@ const Friend = () => {
                 </p>
                
             </div>
-            <div className="w-2 h-2 bg-sky-500 rounded-full animate-pulse"></div>
+            <div className={`w-2 h-2   ${item.senderId == selector.id || item.receiverId == selector.id ? "bg-sky-500" : "bg-slate-200"} animate-pulse rounded-full`}></div>
             </div>
       ))}
 
