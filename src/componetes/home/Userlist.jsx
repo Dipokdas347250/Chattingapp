@@ -63,7 +63,7 @@ const UserList = () => {
       receiverEmail: item.email,
       // receiverPhone: item.number,
       status: "pending",
-      photoURL: item.photoURL || "https://example.com/default-profile.jpg"
+      photoURL: user.photoURL || "https://example.com/default-profile.jpg"
      
 
     });

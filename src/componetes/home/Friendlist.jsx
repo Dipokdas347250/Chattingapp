@@ -55,10 +55,11 @@ const FriendList = () => {
             {/* Avatar + Info */}
             <div className="flex items-center gap-3">
               <div className="relative">
-                {friend.photoURL ? (
+                
+                {friend.photo ? (
                   <img
-                    src={friend.photoURL}
-                    alt={friend.photoURL}
+                    src={friend.photo}
+                    alt={friend.photo}
                     className="w-12 h-12 rounded-full object-cover border-2 border-sky-500"
                   />
                 ) : (
@@ -72,7 +73,7 @@ const FriendList = () => {
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-slate-800">{friend.receiverName}</h2>
+                <h2 className="text-lg font-semibold text-slate-800">{friend.sendername}</h2>
                 <h2 className="text-[14px] font-semibold text-slate-800">{friend.senderEmail}</h2>
                 
               </div>
