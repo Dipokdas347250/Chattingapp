@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaHome, FaUser } from "react-icons/fa";
 import { MdMessage } from "react-icons/md";
 import Userlist from "./Userlist";
@@ -8,14 +8,18 @@ import { getAuth, signOut } from "firebase/auth";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import Friend from "../message/Friend";
+import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import moment from "moment/moment";
 
-const user = () => {
+const user = () => {    
   let user = useSelector((state) => state.user.value);
+   const db = getDatabase();
   const [activePage, setActivePage] = useState("home");
   const [messages, setMessages] = useState([]);
-  const [text, setText] = useState("");
+  const [textmess, settextMess] = useState("");
   const [showLogoutPopup, setShowLogoutPopup] = useState(false); // 🔸 Popup state
   const auth = getAuth();
+  let [friendmess,setFriendmess] = useState([])
 
   let navigate = useNavigate();
   let selector = useSelector((state) => state.messageselect.value);
@@ -38,6 +42,50 @@ const user = () => {
     });
     setShowLogoutPopup(false);
   };
+
+
+  const handleTextChange = (e) => {
+    settextMess(e.target.value);
+    
+  };
+  const handleSendMessage = (e) => {
+    set(push(ref(db, 'messagelist/')), {
+          senderId: user.uid,
+          sendername: user.displayName,
+          senderEmail: user.email,
+          // senderPhone: user.number,
+          receiverId: selector.id,
+          receiverName: selector.name,
+          receiverEmail: selector.email,
+          textmess: textmess,
+          time: `${new Date().getFullYear()} -${new Date().getMonth()+1} -${new Date().getDate()} -${new Date().getHours()} -${new Date().getMinutes()} -${new Date().getSeconds()} `
+          // receiverPhone: item.number,
+         
+    
+        });
+    
+  }
+
+  useEffect(()=>{
+    const messagelistRef = ref(db, 'messagelist/');
+        onValue(messagelistRef, (snapshot) => {
+          let array = [];
+          snapshot.forEach((item) => {
+           if(user.uid == item.val().senderId && selector.id == item.val().receiverId || user.uid == item.val().receiverId && selector.id == item.val().senderId){
+
+             array.push(item.val())
+           }
+          });
+          setFriendmess(array)
+
+    
+        });
+
+  },[selector])
+
+  console.log(friendmess);
+  
+
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -138,19 +186,24 @@ const user = () => {
 
             </div>
 
-            {/* 💬 Message Section */}
+         {selector &&
+
             <div className="bg-white rounded-lg shadow-md p-6 flex flex-col h-[70vh] flex-1">
               <h1 className="text-2xl font-bold mb-4 text-slate-800">💬 {selector.name}</h1>
 
               <div className="flex-1 overflow-auto mb-4 space-y-2">
                 <div className="h-screen overflow-y-auto p-4 pb-36">
+                  {friendmess.map((item)=>(
+                    item.senderId == user.uid ?
+
+                    
                       < div className="flex justify-end mb-4 cursor-pointer" >
                         <div className="flex max-w-96 bg-indigo-500 text-white rounded-lg p-3 gap-3">
                           <div>
                             <p>
-                            
+                            {item.textmess}
                             </p>
-                            <p></p>
+                            <p className="text-[12px]">{moment(item.time, "YYYYMMDDh:mm:ss a").fromNow()}</p>
                           </div>
                         </div>
                         <div className="w-9 h-9 rounded-full flex items-center justify-center ml-2">
@@ -161,8 +214,7 @@ const user = () => {
                           />
                         </div>
                       </div>
-                      
-
+                      :
                       <div className="flex mb-4 cursor-pointer">
                         <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2">
                           <img
@@ -171,13 +223,19 @@ const user = () => {
                             className="w-8 h-8 rounded-full"
                           />
                         </div>
-                        <div className="flex max-w-96 bg-white rounded-lg p-3 gap-3">
+                        <div className="flex max-w-96 bg-cyan-400 rounded-lg p-3 gap-3">
                           <div>
-                            <p className="text-gray-700">dfhsdg</p>
-                            <p></p>
+                            <p className="text-[#000]">{item.textmess}</p>
+                             <p  className="text-[12px]">{moment(item.time, "YYYYMMDDh:mm:ss a").fromNow()}</p>
+                           
                           </div>
                         </div>
                       </div>
+
+                  ))}
+                      
+                      
+
                   
 
 
@@ -188,19 +246,20 @@ const user = () => {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
+                  value={textmess}
+                  onChange={handleTextChange}
                   className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300"
                   placeholder="Type a message..."
                 />
                 <button
-                  onClick={sendMessage}
+                  onClick={handleSendMessage}
                   className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
                 >
                   Send
                 </button>
               </div>
             </div>
+         }
           </div>
         )}
 

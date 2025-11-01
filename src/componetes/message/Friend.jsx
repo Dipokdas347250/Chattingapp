@@ -13,14 +13,13 @@ const Friend = () => {
   useEffect(() => {
     const friendlistRef = ref(db, 'friendlist/');
     onValue(friendlistRef, (snapshot) => {
-      console.log(snapshot.val());
       let array = [];
 
       snapshot.forEach((item) => {
 
-        if(user.uid === item.val().senderId || user.uid === item.val().receiverId){
-
+        if(user.uid == item.val().senderId || user.uid == item.val().receiverId){
           array.push({ ...item.val(), id: item.key });
+
         }
        
       });
@@ -31,10 +30,10 @@ const Friend = () => {
     });
   }, []);
   let handlefriend = (item) => {
-    if (user.uid == item.sendername) {
+    if (user.uid == item.senderId) {
 
       dispatch(messageselect({
-        name: item.receivername,
+        name: item.receiverName,
         id: item.receiverId,
         email: item.receiverEmail,
         photoURL: item.photoURL
@@ -61,14 +60,14 @@ const Friend = () => {
           <div className="relative">
             <img
               src={item.photoURL}
-              alt={item.sendername}
+              alt={item.senderName}
               className="w-10 h-10 rounded-full object-cover border border-slate-200"
             />
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
           </div>
           <div className="flex-1">
-            {user.uid == item.sendername ? (
-              <h3 className="text-slate-800 font-medium leading-tight">{item.receivername}</h3>
+            {user.uid == item.senderId ? (
+              <h3 className="text-slate-800 font-medium leading-tight">{item.receiverName}</h3>
             ) : (
               <h3 className="text-slate-800 font-medium leading-tight">{item.sendername}</h3>
             )}

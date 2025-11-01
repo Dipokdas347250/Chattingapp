@@ -57,13 +57,15 @@ const UserList = () => {
       senderId: user.uid,
       sendername: user.displayName,
       senderEmail: user.email,
+      senderphotoURL: user.photoURL || "https://example.com/default-profile.jpg",
       // senderPhone: user.number,
       receiverId: item.id,
       receiverName: item.username,
       receiverEmail: item.email,
+      receiverphotoURL: item.photoURL || "https://example.com/default-profile.jpg",
+
       // receiverPhone: item.number,
       status: "pending",
-      photoURL: user.photoURL || "https://example.com/default-profile.jpg"
      
 
     });
