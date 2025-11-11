@@ -2,6 +2,8 @@ import { getDatabase, onValue, push, ref, remove, set } from "firebase/database"
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import { messageselect } from "../../slices/messageSlice";
+import { BsThreeDotsVertical } from "react-icons/bs";
+
 
 const Friend = () => {
   let user = useSelector((state) => state.user.value);
@@ -48,6 +50,9 @@ const Friend = () => {
     }
 
   }
+  let [show, setShow] = useState(()=>{
+
+  })
 
 
   return (
@@ -77,10 +82,25 @@ const Friend = () => {
 
           </div>
           <div className={`w-2 h-2   ${item.senderId == selector.id || item.receiverId == selector.id ? "bg-sky-500" : "bg-slate-200"} animate-pulse rounded-full`}></div>
+          <div onClick={()=>setShow(!show)} className="p-1 border rounded-full">
+            <BsThreeDotsVertical/>
+          </div>
+         
         </div>
       ))}
 
-
+       {show &&
+          
+          <div className="bg-emerald-300 p-3">
+            <ul className="text-slate-800 font-medium leading-tight" >
+              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">View Contact</li>
+              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">Search</li>
+              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">New Group</li>
+              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">Mute notificaton</li>
+              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">Block</li>
+            </ul>
+          </div>
+          }
 
 
 

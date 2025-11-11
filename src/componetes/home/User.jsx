@@ -179,7 +179,7 @@ const user = () => {
         {activePage === "message" && (
           <div className="flex gap-4">
             {/* 👤 User Section */}
-            <div className="bg-white rounded-lg shadow-md p-6 w-[250px] h-[70vh] flex flex-col">
+            <div className="bg-white rounded-lg shadow-md p-6 w-[450px] h-[70vh] flex flex-col">
               <h1 className="text-xl font-bold mb-4 text-slate-800">👥 Friend</h1>
               <Friend />
 
