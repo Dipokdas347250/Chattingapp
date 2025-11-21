@@ -3,6 +3,7 @@ import { FaHome, FaUser } from "react-icons/fa";
 import { MdMessage } from "react-icons/md";
 import Userlist from "./Userlist";
 import FriendList from "./Friendlist";
+import Blocklist from "./Blocklist";
 import { useSelector } from "react-redux";
 import { getAuth, signOut } from "firebase/auth";
 import toast from "react-hot-toast";
@@ -83,7 +84,7 @@ const user = () => {
 
   },[selector])
 
-  console.log(friendmess);
+
   
 
 
@@ -123,6 +124,7 @@ const user = () => {
           <div>
             <Userlist />
             <FriendList />
+            <Blocklist/>
           </div>
         )}
 

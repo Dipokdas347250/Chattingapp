@@ -19,11 +19,11 @@ const Friend = () => {
 
       snapshot.forEach((item) => {
 
-        if(user.uid == item.val().senderId || user.uid == item.val().receiverId){
+        if (user.uid == item.val().senderId || user.uid == item.val().receiverId) {
           array.push({ ...item.val(), id: item.key });
 
         }
-       
+
       });
       setFriend(array);
 
@@ -50,57 +50,97 @@ const Friend = () => {
     }
 
   }
-  let [show, setShow] = useState(()=>{
+  let [show, setShow] = useState(() => {
 
   })
+
+  let handleBlock = (item) => {
+
+    if (user.uid == item.senderId) {
+      set(push(ref(db, 'Blocklist/')), {
+        BlockbyId : user.uid,
+        Blockby : user.displayName,
+        Blockuser : item.receiverName,
+        BlockuserId : item.receiverId
+
+      }).then(() => {
+         remove(ref(db, 'friendlist/' + item.id));
+       });
+    }else{
+      set(push(ref(db, 'Blocklist/')), {
+        BlockbyId : user.uid,
+        Blockby : user.displayName,
+        Blockuser : item.sendername,
+        BlockuserId : item.senderId
+
+      }).then(() => {
+         remove(ref(db, 'friendlist/' + item.id));
+       });
+    }
+  }
 
 
   return (
     <>
 
-
       {friend.map((item) => (
+        <div key={item.id}>
 
-        <div onClick={() => handlefriend(item)} className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer hover:bg-sky-100 transition-all duration-200 group `}>
-          <div className="relative">
-            <img
-              src={item.photoURL}
-              alt={item.senderName}
-              className="w-10 h-10 rounded-full object-cover border border-slate-200"
-            />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
-          </div>
-          <div className="flex-1">
-            {user.uid == item.senderId ? (
-              <h3 className="text-slate-800 font-medium leading-tight">{item.receiverName}</h3>
-            ) : (
-              <h3 className="text-slate-800 font-medium leading-tight">{item.sendername}</h3>
-            )}
-            <p className="text-xs text-slate-400 group-hover:text-sky-600">
-              Online
-            </p>
+          {/* Friend Row */}
+          <div
+            onClick={() => handlefriend(item)}
+            className="flex items-center gap-3 p-2 rounded-xl cursor-pointer hover:bg-sky-100 transition-all duration-200 group"
+          >
+            <div className="relative">
+              <img
+                src={item.photoURL}
+                className="w-10 h-10 rounded-full object-cover border border-slate-200"
+              />
+            </div>
 
+            <div className="flex-1">
+              <h3 className="text-slate-800 font-medium leading-tight">
+                {user.uid === item.senderId ? item.receiverName : item.sendername}
+              </h3>
+              <p className="text-xs text-slate-400 group-hover:text-sky-600">Online</p>
+            </div>
+
+            {/* Three dots menu button */}
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setShow(show === item.id ? null : item.id);
+              }}
+              className="p-1 border rounded-full"
+            >
+              <BsThreeDotsVertical />
+            </div>
           </div>
-          <div className={`w-2 h-2   ${item.senderId == selector.id || item.receiverId == selector.id ? "bg-sky-500" : "bg-slate-200"} animate-pulse rounded-full`}></div>
-          <div onClick={()=>setShow(!show)} className="p-1 border rounded-full">
-            <BsThreeDotsVertical/>
-          </div>
-         
+
+
+          {show === item.id && (
+            <div className="bg-emerald-300 p-3 ml-12 mt-1 rounded-lg shadow">
+              <ul className="text-slate-800 font-medium leading-tight">
+                <li className="p-2 hover:bg-[#fff] border cursor-pointer">View Contact</li>
+                <li className="p-2 hover:bg-[#fff] border cursor-pointer">Search</li>
+                <li className="p-2 hover:bg-[#fff] border cursor-pointer">New Group</li>
+                <li className="p-2 hover:bg-[#fff] border cursor-pointer">Mute notification</li>
+
+                <li
+                  onClick={() => handleBlock(item)}
+                  className="p-2 hover:bg-[#fff] border cursor-pointer"
+                >
+                  Block
+                </li>
+              </ul>
+            </div>
+          )}
+
         </div>
       ))}
 
-       {show &&
-          
-          <div className="bg-emerald-300 p-3">
-            <ul className="text-slate-800 font-medium leading-tight" >
-              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">View Contact</li>
-              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">Search</li>
-              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">New Group</li>
-              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">Mute notificaton</li>
-              <li className="p-2 hover:bg-[#fff] border mt-0.5 cursor-pointer">Block</li>
-            </ul>
-          </div>
-          }
+
+
 
 
 
